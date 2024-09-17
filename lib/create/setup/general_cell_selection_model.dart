@@ -3,10 +3,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:nakya/consts.dart';
-import 'package:nakya/create/experiment_selection_provider.dart';
+import 'package:nakya/create/setup/general_cell_selection_provider.dart';
 
-class ExperimentTypeSelectionModal extends HookConsumerWidget {
-  const ExperimentTypeSelectionModal({super.key});
+class GeneralCellLineSelectionModal extends HookConsumerWidget {
+  const GeneralCellLineSelectionModal({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,13 +17,13 @@ class ExperimentTypeSelectionModal extends HookConsumerWidget {
     final searchController = useTextEditingController();
 
     // Get the state and notifier from the provider
-    final state = ref.watch(experimentSelectionProvider);
-    final notifier = ref.read(experimentSelectionProvider.notifier);
+    final state = ref.watch(generalCellLineSelectionProvider);
+    final notifier = ref.read(generalCellLineSelectionProvider.notifier);
 
-    // Filtered experiments are now directly from the provider
-    final filteredProcesses = state.experiments
-        .where((process) =>
-            process.toLowerCase().contains(state.searchQuery.toLowerCase()))
+    // Filtered cell lines are now directly from the provider
+    final filteredCellLines = state.cellLines
+        .where((cellLine) =>
+            cellLine.toLowerCase().contains(state.searchQuery.toLowerCase()))
         .toList();
 
     return Container(
@@ -43,7 +43,7 @@ class ExperimentTypeSelectionModal extends HookConsumerWidget {
               horizontal: 16,
             ),
             child: Text(
-              'Select Experiment Type',
+              'Select General Cell Line',
               style: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
                 fontSize: 18,
@@ -89,15 +89,15 @@ class ExperimentTypeSelectionModal extends HookConsumerWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: filteredProcesses.length,
+              itemCount: filteredCellLines.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
                   child: InkWell(
                     onTap: () {
-                      notifier.selectExperiment(filteredProcesses[
-                          index]); // Update selected experiment
+                      notifier.selectCellLine(filteredCellLines[
+                          index]); // Update selected cell line
                       Navigator.of(context).pop();
                     },
                     onHover: (val) {
@@ -119,7 +119,7 @@ class ExperimentTypeSelectionModal extends HookConsumerWidget {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          filteredProcesses[index],
+                          filteredCellLines[index],
                           style: GoogleFonts.montserrat(
                             color: Colors.grey.shade400,
                             fontSize: 16,

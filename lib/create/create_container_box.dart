@@ -21,11 +21,11 @@ class CreateContainerBox extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 8),
+        SizedBox(height: 4),
         Container(
           decoration: BoxDecoration(
             border: Border.all(
-                color: focus ? Colors.grey.shade400 : Colors.grey.shade800),
+                color: focus ? Colors.greenAccent : Colors.grey.shade800),
             borderRadius: BorderRadius.circular(12),
           ),
           child: child,

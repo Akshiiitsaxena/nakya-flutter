@@ -3,10 +3,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:nakya/consts.dart';
-import 'package:nakya/create/collab_selection_provider.dart';
+import 'package:nakya/create/setup/instrument_selection_provider.dart'; // Assuming you have this
 
-class CollaboratorSelectionModal extends HookConsumerWidget {
-  const CollaboratorSelectionModal({super.key});
+class InstrumentSelectionModal extends HookConsumerWidget {
+  const InstrumentSelectionModal({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,14 +17,13 @@ class CollaboratorSelectionModal extends HookConsumerWidget {
     final searchController = useTextEditingController();
 
     // Get the state and notifier from the provider
-    final state = ref.watch(collaboratorSelectionProvider);
-    final notifier = ref.read(collaboratorSelectionProvider.notifier);
+    final state = ref.watch(instrumentSelectionProvider);
+    final notifier = ref.read(instrumentSelectionProvider.notifier);
 
-    // Filtered collaborators from the provider
-    final filteredCollaborators = state.collaborators
-        .where((collaborator) => collaborator
-            .toLowerCase()
-            .contains(state.searchQuery.toLowerCase()))
+    // Filtered instruments from the provider
+    final filteredInstruments = state.instruments
+        .where((instrument) =>
+            instrument.toLowerCase().contains(state.searchQuery.toLowerCase()))
         .toList();
 
     return Container(
@@ -44,7 +43,7 @@ class CollaboratorSelectionModal extends HookConsumerWidget {
               horizontal: 16,
             ),
             child: Text(
-              'Select Collaborators',
+              'Select Instruments',
               style: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
                 fontSize: 18,
@@ -67,7 +66,7 @@ class CollaboratorSelectionModal extends HookConsumerWidget {
                 border: InputBorder.none,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                hintText: 'Search Collaborators',
+                hintText: 'Search Instruments',
                 hintStyle: GoogleFonts.montserrat(
                   color: Colors.grey.shade700,
                   fontSize: 14,
@@ -84,25 +83,25 @@ class CollaboratorSelectionModal extends HookConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // Display selected collaborators
-          if (state.selectedCollaborators.isNotEmpty)
+          // Display selected instruments
+          if (state.selectedInstruments.isNotEmpty)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: state.selectedCollaborators.map((collaborator) {
+                children: state.selectedInstruments.map((instrument) {
                   return Chip(
                     label: Text(
-                      collaborator,
+                      instrument,
                       style: GoogleFonts.montserrat(
                         color: Colors.white,
                       ),
                     ),
                     deleteIcon: Icon(Icons.cancel, color: Colors.grey.shade400),
                     onDeleted: () {
-                      notifier.toggleCollaborator(
-                          collaborator); // Deselect collaborator
+                      notifier
+                          .toggleInstrument(instrument); // Deselect instrument
                     },
                     backgroundColor: Colors.grey.shade800,
                   );
@@ -118,14 +117,14 @@ class CollaboratorSelectionModal extends HookConsumerWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: filteredCollaborators.length,
+              itemCount: filteredInstruments.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
                   child: InkWell(
                     onTap: () {
-                      notifier.toggleCollaborator(filteredCollaborators[index]);
+                      notifier.toggleInstrument(filteredInstruments[index]);
                     },
                     onHover: (val) {
                       if (val) {
@@ -146,7 +145,7 @@ class CollaboratorSelectionModal extends HookConsumerWidget {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          filteredCollaborators[index],
+                          filteredInstruments[index],
                           style: GoogleFonts.montserrat(
                             color: Colors.grey.shade400,
                             fontSize: 16,

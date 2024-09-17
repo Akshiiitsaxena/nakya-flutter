@@ -3,10 +3,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:nakya/consts.dart';
-import 'package:nakya/create/general_cell_selection_provider.dart';
+import 'package:nakya/create/setup/collab_selection_provider.dart';
 
-class GeneralCellLineSelectionModal extends HookConsumerWidget {
-  const GeneralCellLineSelectionModal({super.key});
+class CollaboratorSelectionModal extends HookConsumerWidget {
+  const CollaboratorSelectionModal({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,13 +17,14 @@ class GeneralCellLineSelectionModal extends HookConsumerWidget {
     final searchController = useTextEditingController();
 
     // Get the state and notifier from the provider
-    final state = ref.watch(generalCellLineSelectionProvider);
-    final notifier = ref.read(generalCellLineSelectionProvider.notifier);
+    final state = ref.watch(collaboratorSelectionProvider);
+    final notifier = ref.read(collaboratorSelectionProvider.notifier);
 
-    // Filtered cell lines are now directly from the provider
-    final filteredCellLines = state.cellLines
-        .where((cellLine) =>
-            cellLine.toLowerCase().contains(state.searchQuery.toLowerCase()))
+    // Filtered collaborators from the provider
+    final filteredCollaborators = state.collaborators
+        .where((collaborator) => collaborator
+            .toLowerCase()
+            .contains(state.searchQuery.toLowerCase()))
         .toList();
 
     return Container(
@@ -43,7 +44,7 @@ class GeneralCellLineSelectionModal extends HookConsumerWidget {
               horizontal: 16,
             ),
             child: Text(
-              'Select General Cell Line',
+              'Select Collaborators',
               style: GoogleFonts.montserrat(
                 color: Colors.grey.shade400,
                 fontSize: 18,
@@ -66,7 +67,7 @@ class GeneralCellLineSelectionModal extends HookConsumerWidget {
                 border: InputBorder.none,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                hintText: 'Search',
+                hintText: 'Search Collaborators',
                 hintStyle: GoogleFonts.montserrat(
                   color: Colors.grey.shade700,
                   fontSize: 14,
@@ -82,6 +83,34 @@ class GeneralCellLineSelectionModal extends HookConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+
+          // Display selected collaborators
+          if (state.selectedCollaborators.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: state.selectedCollaborators.map((collaborator) {
+                  return Chip(
+                    label: Text(
+                      collaborator,
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                      ),
+                    ),
+                    deleteIcon: Icon(Icons.cancel, color: Colors.grey.shade400),
+                    onDeleted: () {
+                      notifier.toggleCollaborator(
+                          collaborator); // Deselect collaborator
+                    },
+                    backgroundColor: Colors.grey.shade800,
+                  );
+                }).toList(),
+              ),
+            ),
+
+          const SizedBox(height: 16),
           Divider(
             color: Colors.grey.shade800,
             height: 5,
@@ -89,16 +118,14 @@ class GeneralCellLineSelectionModal extends HookConsumerWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: filteredCellLines.length,
+              itemCount: filteredCollaborators.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
                   child: InkWell(
                     onTap: () {
-                      notifier.selectCellLine(filteredCellLines[
-                          index]); // Update selected cell line
-                      Navigator.of(context).pop();
+                      notifier.toggleCollaborator(filteredCollaborators[index]);
                     },
                     onHover: (val) {
                       if (val) {
@@ -119,7 +146,7 @@ class GeneralCellLineSelectionModal extends HookConsumerWidget {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          filteredCellLines[index],
+                          filteredCollaborators[index],
                           style: GoogleFonts.montserrat(
                             color: Colors.grey.shade400,
                             fontSize: 16,

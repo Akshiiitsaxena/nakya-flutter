@@ -4,22 +4,26 @@ class GeneralCellLineSelectionState {
   final String searchQuery;
   final String selectedCellLine;
   final List<String> cellLines;
+  final bool isHighlighted;
 
   GeneralCellLineSelectionState({
     required this.searchQuery,
     required this.selectedCellLine,
     required this.cellLines,
+    required this.isHighlighted,
   });
 
   GeneralCellLineSelectionState copyWith({
     String? searchQuery,
     String? selectedCellLine,
     List<String>? cellLines,
+    bool? isHighlighted,
   }) {
     return GeneralCellLineSelectionState(
       searchQuery: searchQuery ?? this.searchQuery,
       selectedCellLine: selectedCellLine ?? this.selectedCellLine,
       cellLines: cellLines ?? this.cellLines,
+      isHighlighted: isHighlighted ?? this.isHighlighted,
     );
   }
 }
@@ -27,16 +31,19 @@ class GeneralCellLineSelectionState {
 class GeneralCellLineSelectionNotifier
     extends StateNotifier<GeneralCellLineSelectionState> {
   GeneralCellLineSelectionNotifier()
-      : super(GeneralCellLineSelectionState(
-          searchQuery: '',
-          selectedCellLine: '',
-          cellLines: [
-            'CHO',
-            'HEK',
-            'Stem cells',
-            'Non Stem cells',
-          ],
-        ));
+      : super(
+          GeneralCellLineSelectionState(
+            searchQuery: '',
+            selectedCellLine: '',
+            cellLines: [
+              'CHO',
+              'HEK',
+              'Stem cells',
+              'Non Stem cells',
+            ],
+            isHighlighted: false,
+          ),
+        );
 
   // Update search query
   void setSearchQuery(String query) {
@@ -46,6 +53,10 @@ class GeneralCellLineSelectionNotifier
   // Select a cell line
   void selectCellLine(String cellLine) {
     state = state.copyWith(selectedCellLine: cellLine);
+  }
+
+  void setHighlighted(bool val) {
+    state = state.copyWith(isHighlighted: val);
   }
 
   // Get filtered cell lines based on search query
