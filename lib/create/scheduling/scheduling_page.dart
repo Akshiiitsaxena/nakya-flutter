@@ -1,93 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:nakya/consts.dart';
+import 'package:nakya/create/scheduling/event_data_source.dart';
+import 'package:nakya/create/scheduling/scheduling_conditions.dart';
+import 'package:nakya/create/scheduling/scheduling_provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:intl/intl.dart';
 
-class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({Key? key}) : super(key: key);
+class CalendarScreen extends ConsumerStatefulWidget {
+  const CalendarScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  late MeetingDataSource _events;
-  String? _selectedAppointmentType;
-  final List<AppointmentType> _appointmentTypes = [
-    AppointmentType('Meeting', Colors.blue),
-    AppointmentType('Conference', Colors.green),
-    AppointmentType('Holiday', Colors.red),
-    AppointmentType('Personal', Colors.orange),
+class _CalendarScreenState extends ConsumerState<CalendarScreen> {
+  late EventDataSource events;
+
+  final List<Condition> conditions = [
+    Condition('Feed', const Color(0xFF00796B)),
+    Condition('Nutrients', const Color(0xFFFFA000)),
+    Condition('Agitation', const Color(0xFFE64A19)),
+    Condition('Inoculation', const Color(0xFFAFB42B)),
+    Condition('Sample Volume', const Color(0xFF5E35B1)),
+    Condition('Harvest', const Color(0xFFD81B60)),
   ];
 
   @override
   void initState() {
     super.initState();
-    _events = MeetingDataSource(_getDataSource());
+    events = EventDataSource(getDataSource());
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheduleState = ref.watch(scheduleSelectionProvider);
+    final scheduleNotifier = ref.read(scheduleSelectionProvider.notifier);
+
     return Scaffold(
       body: Row(
         children: [
-          // Left side - Appointment type boxes
-          Container(
-            width: 150,
-            child: ListView.builder(
-              itemCount: _appointmentTypes.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedAppointmentType = _appointmentTypes[index].name;
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.all(8),
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: _appointmentTypes[index].color,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: _selectedAppointmentType ==
-                                _appointmentTypes[index].name
-                            ? Colors.black
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                    child: Text(
-                      _appointmentTypes[index].name,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          // Right side - Calendar
+          const SchedulingConditions(),
           Expanded(
             child: SfCalendar(
+              backgroundColor: bgColor,
+              headerStyle: CalendarHeaderStyle(
+                backgroundColor: bgColor,
+                textAlign: TextAlign.center,
+                textStyle: GoogleFonts.montserrat(
+                  color: Colors.grey.shade100,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              viewHeaderStyle: ViewHeaderStyle(
+                backgroundColor: Colors.grey.shade900,
+                dayTextStyle: GoogleFonts.montserrat(
+                  color: Colors.grey.shade100,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              appointmentTextStyle: GoogleFonts.montserrat(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+              cellBorderColor: Colors.grey.shade800,
+              todayHighlightColor: Colors.white,
               view: CalendarView.month,
-              dataSource: _events,
+              todayTextStyle: const TextStyle(color: Colors.black),
+              dataSource: events,
               allowAppointmentResize: true,
               allowDragAndDrop: true,
               onTap: (calendarTapDetails) {
-                // calendarTapDetails.
                 if (calendarTapDetails.targetElement ==
                     CalendarElement.calendarCell) {
-                  _addAppointment(calendarTapDetails.date!);
+                  addEventsForSelectedConditions(
+                      calendarTapDetails.date!, scheduleState.selectedValues);
                 } else if (calendarTapDetails.targetElement ==
                     CalendarElement.appointment) {
-                  Meeting meeting = calendarTapDetails.appointments![0];
-                  _showAppointmentDialog(context, meeting);
+                  Event event = calendarTapDetails.appointments![0];
+                  showEventDialog(context, event);
                 }
               },
-              dragAndDropSettings:
-                  DragAndDropSettings(autoNavigateDelay: Duration(seconds: 1)),
               monthViewSettings: MonthViewSettings(
                 appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
                 appointmentDisplayCount: 4,
+                monthCellStyle: MonthCellStyle(
+                  textStyle:
+                      TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                ),
               ),
             ),
           ),
@@ -96,152 +95,40 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  void _addAppointment(DateTime date) {
-    if (_selectedAppointmentType != null) {
-      final AppointmentType selectedType = _appointmentTypes.firstWhere(
-        (type) => type.name == _selectedAppointmentType,
-      );
+  void addEventsForSelectedConditions(
+      DateTime date, Map<int, Set<int>> selectedValues) {
+    selectedValues.forEach((conditionIndex, valueIndices) {
+      for (var valueIndex in valueIndices) {
+        final Condition selectedCondition = conditions[valueIndex];
+        final String vesselId = getVesselId(conditionIndex);
+        final String eventName = '$vesselId ${selectedCondition.name}';
 
-      final Meeting newMeeting = Meeting(
-        _selectedAppointmentType!,
-        date,
-        date.add(Duration(hours: 1)),
-        selectedType.color,
-        false,
-      );
-
-      setState(() {
-        _events.appointments!.add(newMeeting);
-        _events.notifyListeners(CalendarDataSourceAction.add, [newMeeting]);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Added $_selectedAppointmentType on ${DateFormat('MMM dd, yyyy').format(date)}')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select an appointment type first')),
-      );
-    }
-  }
-
-  void _showAppointmentDialog(BuildContext context, Meeting meeting) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(meeting.eventName),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                  'Start: ${DateFormat('MMM dd, yyyy hh:mm a').format(meeting.from)}'),
-              Text(
-                  'End: ${DateFormat('MMM dd, yyyy hh:mm a').format(meeting.to)}'),
-              Text('All Day: ${meeting.isAllDay ? 'Yes' : 'No'}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        final Event newEvent = Event(
+          eventName,
+          date,
+          date.add(const Duration(hours: 1)),
+          selectedCondition.color,
         );
-      },
-    );
+
+        setState(() {
+          events.appointments!.add(newEvent);
+          events.notifyListeners(CalendarDataSourceAction.add, [newEvent]);
+        });
+      }
+    });
+
+    ref.read(scheduleSelectionProvider.notifier).clearAll();
   }
 
-  List<Meeting> _getDataSource() {
-    final List<Meeting> meetings = <Meeting>[];
-    final DateTime today = DateTime.now();
-    final DateTime startTime = DateTime(today.year, today.month, today.day, 9);
-    final DateTime endTime = startTime.add(const Duration(hours: 2));
-    meetings.add(Meeting(
-      'Conference',
-      startTime,
-      endTime,
-      const Color(0xFF0F8644),
-      false,
-    ));
-    meetings.add(Meeting(
-      'Conference Also',
-      startTime.add(Duration(days: 2)),
-      endTime.add(Duration(days: 2)),
-      const Color(0xFF0F6844),
-      false,
-    ));
-    return meetings;
-  }
-}
-
-class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(List<Meeting> source) {
-    appointments = source;
+  void showEventDialog(BuildContext context, Event event) {
+    // TODO: Add logic for interacting with added events
   }
 
-  @override
-  DateTime getStartTime(int index) {
-    return _getMeetingData(index).from;
+  List<Event> getDataSource() {
+    return <Event>[];
   }
 
-  @override
-  DateTime getEndTime(int index) {
-    return _getMeetingData(index).to;
+  String getVesselId(int conditionIndex) {
+    return conditionIndex.toString().padLeft(2, '0');
   }
-
-  @override
-  String getSubject(int index) {
-    return _getMeetingData(index).eventName;
-  }
-
-  @override
-  Color getColor(int index) {
-    return _getMeetingData(index).background;
-  }
-
-  @override
-  bool isAllDay(int index) {
-    return _getMeetingData(index).isAllDay;
-  }
-
-  Meeting _getMeetingData(int index) {
-    return appointments![index] as Meeting;
-  }
-
-  @override
-  Object? convertAppointmentToObject(
-      Object? customData, Appointment appointment) {
-    // Create a new Meeting instance from the Appointment
-    final Meeting meeting = Meeting(
-      appointment.subject,
-      appointment.startTime,
-      appointment.endTime,
-      appointment.color,
-      appointment.isAllDay,
-    );
-    return meeting;
-  }
-}
-
-class Meeting {
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
-
-  String eventName;
-  DateTime from;
-  DateTime to;
-  Color background;
-  bool isAllDay;
-}
-
-class AppointmentType {
-  AppointmentType(this.name, this.color);
-
-  final String name;
-  final Color color;
 }

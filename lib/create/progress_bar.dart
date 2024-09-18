@@ -43,7 +43,6 @@ class ProgressBox extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final progressState =
         ref.watch(progressProvider); // Watch the progress state
-    print(progressState.value);
     // Colors for active and inactive steps
     final bool isActive = index < progressState.value;
     final bool isBarColor = index < progressState.value - 1;
