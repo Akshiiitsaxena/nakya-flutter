@@ -13,7 +13,7 @@ class ProgressState {
 }
 
 class ProgressNotifier extends StateNotifier<ProgressState> {
-  ProgressNotifier() : super(ProgressState(value: 3));
+  ProgressNotifier() : super(ProgressState(value: 1));
 
   // Set progress value to a specific integer
   void setProgress(int newValue) {
