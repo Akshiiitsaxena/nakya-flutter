@@ -16,23 +16,28 @@ class NakyaAppBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Text(
-                'N',
-                style: GoogleFonts.spectral(
-                    color: const Color.fromRGBO(105, 240, 174, 1),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'akya',
-                style: GoogleFonts.spectral(
-                    color: Colors.grey.shade100,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
+          InkWell(
+            onTap: () {
+              Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+            },
+            child: Row(
+              children: [
+                Text(
+                  'N',
+                  style: GoogleFonts.spectral(
+                      color: const Color.fromRGBO(105, 240, 174, 1),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'akya',
+                  style: GoogleFonts.spectral(
+                      color: Colors.grey.shade100,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
           if (title != null)
             Text(
