@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nakya/consts.dart';
 
 class NakyaAppBar extends StatelessWidget {
-  final bool showTitle;
-  const NakyaAppBar({super.key, this.showTitle = true});
+  final String? title;
+  const NakyaAppBar({super.key, this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class NakyaAppBar extends StatelessWidget {
               Text(
                 'N',
                 style: GoogleFonts.spectral(
-                    color: Colors.greenAccent,
+                    color: const Color.fromRGBO(105, 240, 174, 1),
                     fontSize: 24,
                     fontWeight: FontWeight.bold),
               ),
@@ -34,9 +34,9 @@ class NakyaAppBar extends StatelessWidget {
               ),
             ],
           ),
-          if (showTitle)
+          if (title != null)
             Text(
-              'Create Experiment',
+              title!,
               style: GoogleFonts.montserrat(
                 color: Colors.white,
                 fontSize: 24,

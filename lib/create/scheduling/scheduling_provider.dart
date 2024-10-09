@@ -10,6 +10,16 @@ class ScheduleSelectionState {
       selectedValues: selectedValues ?? this.selectedValues,
     );
   }
+
+  bool isAnySelected() {
+    bool isSelected = false;
+    selectedValues.forEach(
+      (key, value) {
+        isSelected = isSelected || value.isNotEmpty;
+      },
+    );
+    return isSelected;
+  }
 }
 
 class ScheduleSelectionNotifier extends StateNotifier<ScheduleSelectionState> {

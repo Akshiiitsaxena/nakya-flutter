@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:nakya/create/create_page.dart';
 import 'package:nakya/home/home_page.dart';
 import 'package:nakya/login/login_page.dart';
+import 'package:nakya/tracking/tracking_page.dart';
 
 void main() {
   setUrlStrategy(PathUrlStrategy());
@@ -30,6 +31,9 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (context) => const LoginPage());
           case '/create':
             return MaterialPageRoute(builder: (context) => const CreatePage());
+          case '/track':
+            return MaterialPageRoute(
+                builder: (context) => const TrackingPage());
           default:
             return MaterialPageRoute(builder: (context) => const HomePage());
         }
@@ -37,7 +41,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/login': (context) => const LoginPage(),
-        '/create': (context) => const CreatePage()
+        '/create': (context) => const CreatePage(),
+        '/track': (context) => const TrackingPage()
       },
       debugShowCheckedModeBanner: false,
     );

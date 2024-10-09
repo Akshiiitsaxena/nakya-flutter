@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          NakyaAppBar(showTitle: false),
+          const NakyaAppBar(),
           Container(
             height: 1,
             width: double.infinity,
@@ -100,16 +100,22 @@ class HomePage extends StatelessWidget {
                                   'Kickstart your research—design and initiate your next experiment with ease.',
                             ),
                           ),
-                          HomeCard(
-                            backgroundColor:
-                                Colors.orangeAccent.withOpacity(0.075),
-                            textColor: Colors.orangeAccent,
-                            borderColor: Colors.orangeAccent,
-                            icon: Icon(Icons.assessment,
-                                color: Colors.orangeAccent, size: 32),
-                            title: 'Track Experiment',
-                            content:
-                                'Stay on top of your work—monitor and manage your experiments in real-time.',
+                          InkWell(
+                            onTap: () {
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, '/track', (_) => false);
+                            },
+                            child: HomeCard(
+                              backgroundColor:
+                                  Colors.orangeAccent.withOpacity(0.075),
+                              textColor: Colors.orangeAccent,
+                              borderColor: Colors.orangeAccent,
+                              icon: Icon(Icons.assessment,
+                                  color: Colors.orangeAccent, size: 32),
+                              title: 'Track Experiment',
+                              content:
+                                  'Stay on top of your work—monitor and manage your experiments in real-time.',
+                            ),
                           ),
                           HomeCard(
                             backgroundColor: Colors.indigo.withOpacity(0.1),

@@ -18,15 +18,43 @@ class SchedulingConditions extends HookConsumerWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-            child: Text(
-              'Select one or more conditions',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.montserrat(
-                  color: Colors.grey.shade200, fontWeight: FontWeight.bold),
-            ),
-          ),
+          scheduleState.isAnySelected()
+              ? InkWell(
+                  onTap: () {
+                    scheduleNotifier.clearAll();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.clear_all,
+                          color: Colors.grey.shade400,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Clear selection',
+                          style: GoogleFonts.montserrat(
+                              color: Colors.grey.shade400,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                  child: Text(
+                    'Select one or more conditions',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                        color: Colors.grey.shade200,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
           Expanded(
             child: ListView.builder(
                 padding: EdgeInsets.zero,
@@ -83,7 +111,7 @@ class SchedulingConditions extends HookConsumerWidget {
                                 color = Color(0xFFAFB42B);
                                 break;
                               case 4:
-                                title = "Sample Volume";
+                                title = "Sample & Volume";
                                 color = Color(0xFF5E35B1);
                                 break;
                               case 5:

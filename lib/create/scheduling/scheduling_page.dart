@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:nakya/consts.dart';
 import 'package:nakya/create/scheduling/event_data_source.dart';
+import 'package:nakya/create/scheduling/calendar_modal.dart';
 import 'package:nakya/create/scheduling/scheduling_conditions.dart';
 import 'package:nakya/create/scheduling/scheduling_provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -23,7 +24,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     Condition('Nutrients', const Color(0xFFFFA000)),
     Condition('Agitation', const Color(0xFFE64A19)),
     Condition('Inoculation', const Color(0xFFAFB42B)),
-    Condition('Sample Volume', const Color(0xFF5E35B1)),
+    Condition('Sample & Volume', const Color(0xFF5E35B1)),
     Condition('Harvest', const Color(0xFFD81B60)),
   ];
 
@@ -117,11 +118,28 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       }
     });
 
-    ref.read(scheduleSelectionProvider.notifier).clearAll();
+    // ref.read(scheduleSelectionProvider.notifier).clearAll();
   }
 
   void showEventDialog(BuildContext context, Event event) {
     // TODO: Add logic for interacting with added events
+    print('from ${event.from}');
+    print('to ${event.to}');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: CalendarConditionModal(
+            conditionName: event.eventName,
+            color: event.background,
+            startDate: event.from,
+            endDate: event.to,
+          ),
+        );
+      },
+    );
   }
 
   List<Event> getDataSource() {

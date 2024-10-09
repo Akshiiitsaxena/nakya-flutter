@@ -13,16 +13,74 @@ class ProgressBar extends HookConsumerWidget {
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.symmetric(vertical: 24, horizontal: 36),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 36),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(
-              4,
-              (index) {
-                return ProgressBox(index: index);
-              },
-            ),
+            children: [
+              ...List.generate(
+                4,
+                (index) {
+                  return ProgressBox(index: index);
+                },
+              ),
+              Expanded(child: Container()),
+              Container(
+                width: 150,
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(128),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.greenAccent,
+                            Colors.greenAccent.shade400
+                          ],
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.only(left: 12),
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.black,
+                        size: 24,
+                      ),
+                    ),
+                    SizedBox(width: 32),
+                    InkWell(
+                      onTap: () {
+                        ref.read(progressProvider.notifier).incrementProgress();
+                      },
+                      child: Container(
+                        height: 45,
+                        width: 45,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(128),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.greenAccent,
+                              Colors.greenAccent.shade400
+                            ],
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.black,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // color: Colors.red,
+              )
+            ],
           ),
         ),
         Container(
@@ -53,7 +111,7 @@ class ProgressBox extends HookConsumerWidget {
       {'text': 'Setup', 'step': '1'},
       {'text': 'Conditions', 'step': '2'},
       {'text': 'Scheduling', 'step': '3'},
-      {'text': 'Preferences', 'step': '4'},
+      {'text': 'Summary', 'step': '4'},
     ];
 
     final currentStep = steps[index];

@@ -20,6 +20,7 @@ import 'package:nakya/create/setup/plot_selection_provider.dart';
 import 'package:nakya/create/progress_bar.dart';
 import 'package:nakya/create/progress_provider.dart';
 import 'package:nakya/create/scheduling/scheduling_page.dart';
+import 'package:nakya/create/summary/summary_page.dart';
 
 class CreatePage extends HookConsumerWidget {
   const CreatePage({super.key});
@@ -51,7 +52,7 @@ class CreatePage extends HookConsumerWidget {
     return Scaffold(
       body: Column(
         children: [
-          const NakyaAppBar(),
+          const NakyaAppBar(title: "Create Experiment"),
           Container(
             height: 1,
             width: double.infinity,
@@ -666,9 +667,11 @@ class CreatePage extends HookConsumerWidget {
                     ),
                   // TODO: Change to 2 later
                   if (progressState.value == 2)
-                    Expanded(child: ConditionsPage()),
+                    const Expanded(child: ConditionsPage()),
                   if (progressState.value == 3)
-                    Expanded(child: CalendarScreen())
+                    const Expanded(child: CalendarScreen()),
+                  if (progressState.value == 4)
+                    const Expanded(child: SummaryPage())
                 ],
               ),
             ),
